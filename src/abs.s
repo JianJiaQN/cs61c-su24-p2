@@ -9,10 +9,16 @@
 #   None
 # =================================================================
 abs:
-    # Prologue
+  ebreak
+  # Prologue
+  
+  # PASTE HERE
+  lw t0 0(a0)
+  bge t0 x0 done
+  sub t0 x0 t0
 
-    # PASTE HERE
+  sw t0 0(a0)
+  # Epilogue
 
-    # Epilogue
-
-    jr ra
+done:
+  jr ra
