@@ -24,17 +24,72 @@
 # ==============================================================================
 write_matrix:
 
-    # Prologue
+  # Prologue
+  addi sp sp -16
+  sw ra 0(sp)
+  sw s0 4(sp)
+  sw s1 8(sp)
+  sw s2 12(sp)
 
+  mv s1 a1    # save matrix
+  mul t0 a2 a3
+  mv s2 t0
 
+  # save the num of row and col on sp
+  addi sp sp -8
+  sw a2 0(sp)
+  sw a3 4(sp)
 
+  # open file
+  addi a1 x0 1
+  call fopen
 
+  addi t0 x0 -1
+  beq t0 a0 e_fopen
+  mv s0 a0    # save *fd
 
+  # write row and col
+  mv a0 s0
+  mv a1 sp
+  addi a2 x0 2
+  addi a3 x0 4
+  call fwrite
 
+  addi t0 x0 2
+  bne t0 a0 e_fwrite
 
+  addi sp sp 8 
 
+  # write data
+  mv a0 s0
+  mv a1 s1
+  mv a2 s2
+  addi a3 x0 4
+  call fwrite
 
-    # Epilogue
+  bne a0 s2 e_fwrite
 
+  # close the file
+  mv a0 s0
+  call fclose
 
-    jr ra
+  bne x0 a0 e_fclose
+
+  # Epilogue
+  lw s2 12(sp)
+  lw s1 8(sp)
+  lw s0 4(sp)
+  lw ra 0(sp)
+  addi sp sp 16
+
+  jr ra
+
+e_fopen:
+  li a0 27
+  j exit
+e_fwrite:
+  li a0 30
+  j exit
+e_fclose:
+  li a0 28
+  j exit
